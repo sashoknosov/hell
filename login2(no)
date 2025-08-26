@@ -1,0 +1,82 @@
+login = ["s"]
+password = ["a"]
+m = 0
+dolar = 0  
+
+def vhod():
+    global m
+    a = input("Введите логин\n")  
+    if a in login:
+        b = input("Введите пароль\n")
+        index = login.index(a)
+        while b != password[index] and m < 3:
+            m += 1
+            print(f"Неверный пароль\nОсталось {3 - m} попыток")
+            if m == 3:
+                print("Превышено количество попыток входа")
+                break
+            b = input("Введите пароль\n")
+        else:
+            if b == password[index]:
+                print("Успешный вход")
+                
+    else:
+        print("Логин не найден\n")
+        c = input("Хотите зарегистрироваться? (да/нет)\n")
+        if c.lower() == "да":
+            new_login = input("Введите логин\n")
+            new_password = input("Введите пароль\n")
+            password_a = input("Подтвердите пароль\n")
+            while password_a != new_password:
+                print("Пароли не совпадают")
+                new_password = input("Введите пароль\n")
+                password_a = input("Подтвердите пароль\n")
+            login.append(new_login)
+            password.append(new_password)
+            print("Регистрация завершена")
+            vhod()
+        else:
+            print("Ну как хочешь")
+    
+
+# Основная программа
+if vhod():
+  print(f"Ваш счет {dolar}")
+    g = input('''Что хотите сделать? Введите число
+1.Снять деньги
+2.Пополнить счет
+3.Выход
+''')
+
+    try:
+        g = int(g)
+    except ValueError:
+        print("Некорректный ввод")
+        exit()
+    
+    if g == 1:
+        try:
+            snit = int(input("Сколько вы хотите снять? "))
+            if dolar < snit:
+                print("Недостаточно на счету")
+            else:
+                dolar = dolar - snit
+                print(f"Операция успешна. На счету осталось {dolar}")
+        except ValueError:
+            print("Некорректная сумма")
+            
+    elif g == 2:
+        try:
+            popol = int(input("На сколько вы хотите пополнить? "))
+            if popol > 0:  
+                dolar = dolar + popol
+                print(f"На вашем счету {dolar}")
+            else:
+                print("Сумма должна быть положительной")
+        except ValueError:
+            print("Некорректная сумма")
+            
+    elif g == 3:
+        vhod()
+    else:
+        print("Неверный выбор")
