@@ -1,82 +1,161 @@
 login = ["s"]
 password = ["a"]
-m = 0
-dolar = 0
+accounts = {"s": 0}  
 
 def vhod():
-    global m
-    a = input("Введите логин\n")
-    if a in login:
-        b = input("Введите пароль\n")
-        index = login.index(a)
-        while b != password[index] and m < 3:
-            m += 1
-            print(f"Неверный пароль\nОсталось {3 - m} попыток")
-            if m == 3:
-                print("Превышено количество попыток входа")
-                return False
+    m = 0  
+    
+    while True:
+        a = input("Введите логин\n")
+        if a in login:
             b = input("Введите пароль\n")
-        else:
+            index = login.index(a)
+            
+            while b != password[index] and m < 3:
+                m += 1
+                print(f"Неверный пароль\nОсталось {3 - m} попыток")
+                if m == 3:
+                    print("Превышено количество попыток входа")
+                    return None  
+                b = input("Введите пароль\n")
+            
             if b == password[index]:
                 print("Успешный вход")
-                return True
-    else:
-        print("Логин не найден\n")
-        c = input("Хотите зарегистрироваться? (да/нет)\n")
-        if c.lower() == "да":
-            new_login = input("Введите логин\n")
-            new_password = input("Введите пароль\n")
-            password_a = input("Подтвердите пароль\n")
-            while password_a != new_password:
-                print("Пароли не совпадают")
+                return a 
+        
+        else:
+            print("Логин не найден\n")
+            c = input("Хотите зарегистрироваться? (да/нет)\n")
+            if c.lower() == "да":
+                new_login = input("Введите логин\n")
                 new_password = input("Введите пароль\n")
                 password_a = input("Подтвердите пароль\n")
-            login.append(new_login)
-            password.append(new_password)
-            print("Регистрация завершена")
-            return vhod()
-        else:
-            print("Ну как хочешь")
-            return False
+                
+                while password_a != new_password:
+                    print("Пароли не совпадают")
+                    new_password = input("Введите пароль\n")
+                    password_a = input("Подтвердите пароль\n")
+                
+                login.append(new_login)
+                password.append(new_password)
+                accounts[new_login] = 0  
+                print("Регистрация завершена")
+            else:
+                print("Ну как хочешь")
+                return None
 
+def transfer_money(sender):
+    """Функция для перевода денег другому пользователю"""
+    try:
+        amount = int(input("Введите сумму для перевода: "))
+        
+        if amount <= 0:
+            print("Сумма должна быть положительной")
+            return False
+        
+        if accounts[sender] < amount:
+            print("Недостаточно средств на счете")
+            return False
+        
+        print("\nДоступные пользователи для перевода:")
+        available_users = []
+        for user in accounts.keys():
+            if user != sender:  # Не показываем отправителя
+                print(f"- {user}")
+                available_users.append(user)
+        
+        if not available_users:
+            print("Нет других пользователей для перевода")
+            return False
+        
+        receiver = input("\nВведите логин получателя: ")
+        
+        if receiver not in accounts:
+            print("Получатель не найден")
+            return False
+        
+        if receiver == sender:
+            print("Нельзя переводить самому себе")
+            return False
+        
+        # Подтверждение перевода
+        confirm = input(f"Вы уверены, что хотите перевести {amount} пользователю {receiver}? (да/нет): ")
+        if confirm.lower() != 'да':
+            print("Перевод отменен")
+            return False
+        
+        # Выполняем перевод
+        accounts[sender] -= amount
+        accounts[receiver] += amount
+        print(f"✅ Перевод выполнен успешно!")
+        print(f"С вашего счета списано: {amount}")
+        print(f"Баланс получателя {receiver} пополнен на: {amount}")
+        print(f"Ваш текущий баланс: {accounts[sender]}")
+        return True
+        
+    except ValueError:
+        print("Некорректная сумма")
+        return False
 
 # Основная программа
-if vhod():
-    while True:
-        print(f"Ваш счет {dolar}")
-        g = input('''Что хотите сделать? Введите число\n1.Снять деньги\n2.Пополнить счет\n3.Выход из аккаунта\n4.Выход из программы\n''')
+current_user = None
+
+while True:
+    if current_user is None:
+        current_user = vhod()
+        if current_user is None:
+            break  
+    
+    else:
+        print(f"\nВаш счет: {accounts[current_user]}")
+        g = input('''Что хотите сделать? Введите число
+1. Снять деньги
+2. Пополнить счет
+3. Перевод другим пользователям
+4. Выход из аккаунта
+5. Выход из программы
+Ваш выбор: ''')
+        
         try:
             g = int(g)
         except ValueError:
             print("Некорректный ввод")
             continue
+        
         if g == 1:
             try:
                 snit = int(input("Сколько вы хотите снять? "))
                 if snit <= 0:
                     print("Сумма должна быть положительной")
-                elif dolar < snit:
+                elif accounts[current_user] < snit:
                     print("Недостаточно на счету")
                 else:
-                    dolar -= snit
-                    print(f"Операция успешна. На счету осталось {dolar}")
+                    accounts[current_user] -= snit
+                    print(f"Операция успешна. На счету осталось {accounts[current_user]}")
             except ValueError:
                 print("Некорректная сумма")
+        
         elif g == 2:
             try:
                 popol = int(input("На сколько вы хотите пополнить? "))
                 if popol > 0:
-                    dolar += popol
-                    print(f"На вашем счету {dolar}")
+                    accounts[current_user] += popol
+                    print(f"На вашем счету {accounts[current_user]}")
                 else:
                     print("Сумма должна быть положительной")
             except ValueError:
                 print("Некорректная сумма")
+        
         elif g == 3:
-            print("Вы успешно вышли из аккаунта")
-            vhod()
+            transfer_money(current_user)
+        
         elif g == 4:
-          print("Вы успешно вышли из программы")
-          break
+            print("Вы успешно вышли из аккаунта")
+            current_user = None  
+        
+        elif g == 5:
+            print("Вы успешно вышли из программы")
+            break
+        
         else:
             print("Неверный выбор")
