@@ -1,11 +1,11 @@
 login = ["s"]
 password = ["a"]
 m = 0
-dolar = 0  
+dolar = 0
 
 def vhod():
     global m
-    a = input("Введите логин\n")  
+    a = input("Введите логин\n")
     if a in login:
         b = input("Введите пароль\n")
         index = login.index(a)
@@ -14,12 +14,12 @@ def vhod():
             print(f"Неверный пароль\nОсталось {3 - m} попыток")
             if m == 3:
                 print("Превышено количество попыток входа")
-                break
+                return False
             b = input("Введите пароль\n")
         else:
             if b == password[index]:
                 print("Успешный вход")
-                
+                return True
     else:
         print("Логин не найден\n")
         c = input("Хотите зарегистрироваться? (да/нет)\n")
@@ -34,49 +34,49 @@ def vhod():
             login.append(new_login)
             password.append(new_password)
             print("Регистрация завершена")
-            vhod()
+            return vhod()
         else:
             print("Ну как хочешь")
-    
+            return False
+
 
 # Основная программа
 if vhod():
-  print(f"Ваш счет {dolar}")
-    g = input('''Что хотите сделать? Введите число
-1.Снять деньги
-2.Пополнить счет
-3.Выход
-''')
-
-    try:
-        g = int(g)
-    except ValueError:
-        print("Некорректный ввод")
-        exit()
-    
-    if g == 1:
+    while True:
+        print(f"Ваш счет {dolar}")
+        g = input('''Что хотите сделать? Введите число\n1.Снять деньги\n2.Пополнить счет\n3.Выход из аккаунта\n4.Выход из программы\n''')
         try:
-            snit = int(input("Сколько вы хотите снять? "))
-            if dolar < snit:
-                print("Недостаточно на счету")
-            else:
-                dolar = dolar - snit
-                print(f"Операция успешна. На счету осталось {dolar}")
+            g = int(g)
         except ValueError:
-            print("Некорректная сумма")
-            
-    elif g == 2:
-        try:
-            popol = int(input("На сколько вы хотите пополнить? "))
-            if popol > 0:  
-                dolar = dolar + popol
-                print(f"На вашем счету {dolar}")
-            else:
-                print("Сумма должна быть положительной")
-        except ValueError:
-            print("Некорректная сумма")
-            
-    elif g == 3:
-        vhod()
-    else:
-        print("Неверный выбор")
+            print("Некорректный ввод")
+            continue
+        if g == 1:
+            try:
+                snit = int(input("Сколько вы хотите снять? "))
+                if snit <= 0:
+                    print("Сумма должна быть положительной")
+                elif dolar < snit:
+                    print("Недостаточно на счету")
+                else:
+                    dolar -= snit
+                    print(f"Операция успешна. На счету осталось {dolar}")
+            except ValueError:
+                print("Некорректная сумма")
+        elif g == 2:
+            try:
+                popol = int(input("На сколько вы хотите пополнить? "))
+                if popol > 0:
+                    dolar += popol
+                    print(f"На вашем счету {dolar}")
+                else:
+                    print("Сумма должна быть положительной")
+            except ValueError:
+                print("Некорректная сумма")
+        elif g == 3:
+            print("Вы успешно вышли из аккаунта")
+            vhod()
+        elif g == 4:
+          print("Вы успешно вышли из программы")
+          break
+        else:
+            print("Неверный выбор")
